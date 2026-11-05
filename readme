@@ -1,0 +1,5 @@
+This repository contains a one-page note on registering a Ricoh printer in the Department of Electrical and Electronics Engineering at Bilkent University on Ubuntu, and on printing documents from the command line.
+
+The procedure was tested on 5 November 2026 for a Ricoh MP C4504ex on floor 2 of the EEE building, reached over the Bilkent-EEE network. The printer does not provide a Linux driver, so the note uses OpenPrinting's PCL-XL PPD for the Ricoh MP C4504 (file version 1.1). Grayscale printing with lp was verified. The regular document viewer printing feature did not work, only the command line printing worked. Color printing also did not work yet.
+
+The note is eee-ricoh.pdf. Its source is eee-ricoh.tex.
