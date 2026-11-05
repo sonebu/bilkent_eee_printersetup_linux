@@ -1,0 +1,73 @@
+\documentclass[10pt]{article}
+\usepackage[a4paper,margin=14mm]{geometry}
+\usepackage{fancyvrb}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.4em}
+\fvset{xleftmargin=0.5in,fontsize=\normalsize,baselinestretch=0.95}
+
+\begin{document}
+\begin{center}
+{\Large\bfseries Setup and Use for the Bilkent EEE Printers on Ubuntu}\\[0.3em]
+{\normalsize Tested for a Ricoh MP C4504ex in the EEE building (Floor 2).}\\[0.25em]
+{\normalsize 5 November 2026}
+\end{center}
+
+This note describes how to register a Ricoh printer in Ubuntu, for the devices in the Department of Electrical and Electronics Engineering at Bilkent University, and how to print to documents with them from the command line. Windows setup is straightforward, but there aren't any clear steps for Linux-based distributions, so this aims to clarify the steps for Ubuntu. The building has more than one of these printers, each with its own IP address (and probably model). The procedure below was carried out for one of them, and the driver and IP are specific to that printer.
+
+\vspace{12 px}
+
+The printer is accessed over the \texttt{Bilkent-EEE} network in the building, and it does not provide a driver by itself for Linux, so a PPD file had to be downloaded from OpenPrinting. The file is the PCL-XL description of the Ricoh MP C4504, file version 1.1, listed there as ``Ricoh MP C4504 PXL.'' The C4504ex accepted that description. CUPS applies it through \texttt{foomatic-rip}, which requires Ghostscript and Perl. As a connection detail, IPP on port 631 and JetDirect on port 9100 do not answer, while LPD on port 515 does, so the queue uses \texttt{lpd://ADDRESS/lp}. The account that creates the queue must belong to the \texttt{lpadmin} group.
+
+The setup was verified on Ubuntu 25.10 with CUPS 2.4.12, cups-filters 2.0.1, Ghostscript 10.05.0, and Perl 5.40.1.
+
+\vspace{12 px}
+
+Choose a queue name and download the PPD once. Point the queue at the printer, select paper size and type, tray number, color settings etc., and do not share the queue. On the machine used here, tray 1 holds A4, and grayscale printing was verified. The print dialog in the document viewer did not produce a page though, not sure why that was, only command line \texttt{lp} calls worked. After the queue exists, a document is printed by naming that queue and the document to print, as shown below:
+
+\vspace{6 px}
+
+\begin{Verbatim}
+wget -O /tmp/Ricoh-MP_C4504_PXL.ppd \
+  https://www.openprinting.org/download/PPD/Ricoh/PXL/Ricoh-MP_C4504_PXL.ppd
+
+lpadmin -p QUEUE -E -v lpd://ADDRESS/lp \
+  -P /tmp/Ricoh-MP_C4504_PXL.ppd \
+  -o printer-is-shared=false \
+  -o PageSize=A4 \
+  -o InputSlot=1Tray \
+  -o MediaType=Plain2 \
+  -o ColorModel=Grayscale \
+  -o Duplex=None
+
+lp -d QUEUE yourdocument.pdf
+\end{Verbatim}
+
+\vspace{12 px}
+
+For the printer on the second floor, which had an IP address of \texttt{139.179.31.185} at the time, the queue was named \texttt{Bilkent-kat2} in this test, with the following commands:
+
+\vspace{6 px}
+
+\begin{Verbatim}
+lpadmin -p Bilkent-kat2 -E -v lpd://139.179.31.185/lp \
+  -P /tmp/Ricoh-MP_C4504_PXL.ppd \
+  -o printer-is-shared=false \
+  -o PageSize=A4 \
+  -o InputSlot=1Tray \
+  -o MediaType=Plain2 \
+  -o ColorModel=Grayscale \
+  -o Duplex=None
+
+lp -d Bilkent-kat2 yourdocument.pdf
+\end{Verbatim}
+
+\vspace{6 px}
+
+and the last command with \texttt{lp} prints the page.
+
+\vspace{12 px}
+
+This document just aims to exemplify what the process for setting up a specific printer looked like. For different printer models, there are probably other compatible PPD files. Moreover, it's worth noting that this process wasn't successful in getting the color printing to work. The process was simply stopped since color printing was not needed at the time. 
+
+\end{document}
